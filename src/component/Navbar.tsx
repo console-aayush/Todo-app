@@ -10,31 +10,35 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode, token, onLogout }) => {
   const navigate = useNavigate();
-  const bgClass = darkMode ? "bg-gray-800 text-white" : "bg-white text-black";
-  const buttonHoverClass = darkMode ? "hover:bg-gray-700" : "hover:bg-gray-300";
+
+  const bgClass = darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900";
+  const buttonClass = `px-3 py-1 rounded transition ${darkMode
+      ? "bg-gray-700 hover:bg-gray-600 text-white"
+      : "bg-white hover:bg-gray-200 text-black"
+    }`;
 
   return (
-    <nav className={`flex justify-between items-center px-6 py-3 w-full ${bgClass} shadow`}>
-      <div className="text-xl font-bold">📝 Todo App</div>
-      <div className="flex items-center gap-4">
-        <button
-          onClick={toggleDarkMode}
-          className={`px-3 py-1 rounded border ${buttonHoverClass}`}
-        >
+    <nav className={`flex justify-between items-center px-6 py-3 shadow ${bgClass}`}>
+      {/* Left side - App name */}
+      <div className="text-2xl font-semibold">Todo App</div>
+
+      {/* Right side - Controls */}
+      <div className="flex items-center gap-3">
+        <button onClick={toggleDarkMode} className={buttonClass}>
           {darkMode ? "☀️ Light" : "🌙 Dark"}
         </button>
 
         {token ? (
           <button
             onClick={onLogout}
-            className={`px-3 py-1 rounded border ${buttonHoverClass} bg-red-500 text-white hover:bg-red-600`}
+            className="px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white transition"
           >
             Logout
           </button>
         ) : (
           <button
             onClick={() => navigate("/login")}
-            className={`px-3 py-1 rounded border ${buttonHoverClass} bg-blue-500 text-white hover:bg-blue-600`}
+            className="px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white transition"
           >
             Login
           </button>
