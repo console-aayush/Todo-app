@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { z } from "zod";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import type { Todo } from "../api/todoApi";
-import { fetchAllTodos, addTodo, updateTodo, deleteTodo } from "../api/todoApi";
+import { fetchAllTodos, addTodo, updateTodo, deleteTodo, searchTodos } from "../api/todoApi";
 
 const todoSchema = z.object({
   title: z.string().min(1, "Title is required").refine((val) => isNaN(Number(val)), "Numbers are not allowed"),
@@ -18,6 +19,8 @@ interface TodoPageProps {
 }
 
 const TodoPage: React.FC<TodoPageProps> = ({ darkMode }) => {
+  const navigate = useNavigate();
+
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
   const [category, setCategory] = useState("General");
@@ -27,6 +30,7 @@ const TodoPage: React.FC<TodoPageProps> = ({ darkMode }) => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"All" | "Completed" | "Pending">("All");
 
+  // Load todos
   const loadTodos = async () => {
     try {
       const data = search ? await searchTodos(search) : await fetchAllTodos();
@@ -40,6 +44,7 @@ const TodoPage: React.FC<TodoPageProps> = ({ darkMode }) => {
     loadTodos();
   }, [search]);
 
+  // Add todo
   const handleAddTodo = async () => {
     const validation = todoSchema.safeParse({ title: newTodo, category });
     if (!validation.success) {
@@ -58,6 +63,7 @@ const TodoPage: React.FC<TodoPageProps> = ({ darkMode }) => {
     }
   };
 
+  // Toggle completion
   const handleToggleTodo = async (todo: Todo) => {
     try {
       const updated = await updateTodo(todo.id, { title: todo.title, completed: !todo.completed, category: todo.category || "General" });
@@ -67,6 +73,7 @@ const TodoPage: React.FC<TodoPageProps> = ({ darkMode }) => {
     }
   };
 
+  // Delete todo
   const handleDeleteTodo = async (id: number) => {
     try {
       await deleteTodo(id);
@@ -77,6 +84,7 @@ const TodoPage: React.FC<TodoPageProps> = ({ darkMode }) => {
     }
   };
 
+  // Edit functions
   const startEdit = (todo: Todo) => {
     setEditingId(todo.id);
     setEditingTitle(todo.title);
@@ -106,6 +114,12 @@ const TodoPage: React.FC<TodoPageProps> = ({ darkMode }) => {
     }
   };
 
+  // Logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   const visibleTodos = todos.filter((todo) =>
     filter === "All" ? true : filter === "Completed" ? todo.completed : !todo.completed
   );
@@ -117,6 +131,13 @@ const TodoPage: React.FC<TodoPageProps> = ({ darkMode }) => {
   return (
     <div className={`min-h-screen flex flex-col items-center pt-6 px-4 ${bgClass}`}>
       <ToastContainer position="top-right" autoClose={3000} />
+
+      {/* Logout Button */}
+      <div className="flex justify-end w-full max-w-md mb-4">
+        <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+          Logout
+        </button>
+      </div>
 
       {/* Add Todo */}
       <div className="flex gap-2 w-full max-w-md mb-4">
