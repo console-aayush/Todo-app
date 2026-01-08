@@ -7,7 +7,8 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import TodoPage from "./pages/TodoPage";
 import LogoutPage from "./pages/Logout";
-import { getCurrentUser, UserType } from "./api/api"; // ✅ Must match export name exactly
+import { getCurrentUser } from "./api/api";
+import type { UserType } from "./api/api";
 
 export default function App() {
   const [user, setUser] = useState<UserType | null>(null);
